@@ -18,7 +18,7 @@ describe('MusicController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return "This is the musica controller"', () => {
-    expect(controller.findAll()).toBe('This is the musica controller');
+  it('should return "This is the music controller"', () => {
+    expect(controller.findAll()).toBe('This is the music controller');
   });
 });

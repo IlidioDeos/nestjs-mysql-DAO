@@ -16,7 +16,7 @@ describe('MusicService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should return "This is the musica service"', () => {
-    expect(service.findAll()).toBe('This is the musica service');
+  it('should return "This is the music service"', () => {
+    expect(service.findAll()).toBe('This is the music service');
   });
 });

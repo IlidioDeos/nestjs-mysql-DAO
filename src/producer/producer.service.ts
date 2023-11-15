@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MusicService {
+export class ProducerService {
   findAll(): string {
-    return 'This is the music service';
+    return 'This is the producer service';
   }
 }

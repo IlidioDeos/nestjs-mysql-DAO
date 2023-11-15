@@ -4,6 +4,6 @@ import { Controller, Get } from '@nestjs/common';
 export class MusicController {
   @Get()
   findAll(): string {
-    return 'This is the musica controller';
+    return 'This is the music controller';
   }
 }
