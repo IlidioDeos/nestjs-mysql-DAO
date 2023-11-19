@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciamento de Usuários</title>
+</head>
+<body>
+  <h1>Gerenciamento de Usuários</h1>
+
+  <h2>Adicionar Usuário</h2>
+  <form id="createUserForm">
+    <input type="text" id="name" placeholder="Nome" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="text" id="cpf" placeholder="CPF" required>
+    <button type="submit">Adicionar Usuário</button>
+  </form>
+
+  <h2>Usuários</h2>
+  <ul id="userList"></ul>
+
+  <script>
+    async function getUsers() {
+      try {
+        const response = await fetch('http://localhost:3000/users');
+        const users = await response.json();
+
+        const userList = document.getElementById('userList');
+        userList.innerHTML = '';
+
+        users.forEach(user => {
+          const li = document.createElement('li');
+          li.textContent = `ID: ${user.id}, Nome: ${user.name}, Email: ${user.email}, CPF: ${user.cpf}`;
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Excluir';
+          deleteButton.addEventListener('click', () => {
+            deleteUser(user.id);
+          });
+
+          li.appendChild(deleteButton);
+          userList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar usuários:', error);
+      }
+    }
+
+    async function createUser(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const cpf = document.getElementById('cpf').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/users', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, email, cpf }),
+        });
+
+        if (response.ok) {
+          getUsers();
+        } else {
+          console.error('Erro ao criar usuário');
+        }
+      } catch (error) {
+        console.error('Erro ao criar usuário:', error);
+      }
+    }
+
+    async function deleteUser(userId) {
+      try {
+        const response = await fetch(`http://localhost:3000/users/${userId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          getUsers();
+        } else {
+          console.error('Erro ao excluir usuário');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir usuário:', error);
+      }
+    }
+
+    document.getElementById('createUserForm').addEventListener('submit', createUser);
+    getUsers();
+  </script>
+</body>
+</html>
