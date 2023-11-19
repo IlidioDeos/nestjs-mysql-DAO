@@ -1,0 +1,13 @@
+<!-- list.ejs -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lista de Usuários</title>
+</head>
+<body>
+  <h1>Lista de Usuários</h1>
+  <% users.forEach(user => { %>
+    <p>ID: <%= user.id %>, Nome: <%= user.name %>, E-mail: <%= user.email %></p>
+  <% }) %>
+</body>
+</html>
