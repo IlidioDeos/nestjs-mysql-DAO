@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciamento de Authors</title>
+</head>
+
+<body>
+  <h1>Gerenciamento de Authors</h1>
+
+  <h2>Adicionar Author</h2>
+  <form onsubmit="createAuthor(event)">
+    <input type="text" id="name" placeholder="Nome" required>
+    <input type="stage_name" id="stage_name" placeholder="stage_name" required>
+    <input type="text" id="cpf" placeholder="cpf" minlength="9"
+      title="Por favor, insira um CPF com pelo menos 9 dígitos" required>
+    <button type="submit">Adicionar Author</button>
+  </form>
+
+  <h2>Authors</h2>
+  <ul id="authorList"></ul>
+
+  <h2>Pesquisar Authors</h2>
+  <button onclick="redirectToSearch()">Pesquisar Authors</button>
+
+  <script>
+    async function getAuthors() {
+      try {
+        const response = await fetch('http://localhost:3000/authors');
+        const authors = await response.json();
+
+        const authorList = document.getElementById('authorList');
+        authorList.innerHTML = '';
+
+        authors.forEach(author => {
+          const li = document.createElement('li');
+          li.textContent = `ID: ${author.id}, Nome: ${author.name}, Stage Name: ${author.stage_name}, cpf: ${author.cpf}`;
+
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Excluir';
+          deleteButton.addEventListener('click', () => deleteAuthor(author.id));
+
+          const updateButton = document.createElement('button');
+          updateButton.textContent = 'Editar';
+          updateButton.addEventListener('click', () => redirectToUpdate(author.id));
+
+          li.appendChild(updateButton);
+          li.appendChild(deleteButton);
+          authorList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar Authors:', error);
+      }
+    }
+
+    async function redirectToUpdate(authorId) {
+      window.location.href = `update.html?authorId=${authorId}`;
+    }
+
+    function redirectToSearch() {
+      window.location.href = 'search.html';
+    }
+
+    async function createAuthor(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+      const stage_name = document.getElementById('stage_name').value;
+      const cpf = document.getElementById('cpf').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/authors', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name, stage_name, cpf }),
+        });
+
+        if (response.ok) {
+          getAuthors();
+        } else {
+          console.error('Erro ao criar Author');
+        }
+      } catch (error) {
+        console.error('Erro ao criar Author:', error);
+      }
+    }
+
+    async function deleteAuthor(authorId) {
+      try {
+        const response = await fetch(`http://localhost:3000/authors/${authorId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          getAuthors();
+        } else {
+          console.error('Erro ao excluir Author');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir Author:', error);
+      }
+    }
+
+
+
+    function clearForm() {
+      document.getElementById('name').value = '';
+      document.getElementById('stage_name').value = '';
+      document.getElementById('cpf').value = '';
+
+      const updateButton = document.querySelector('button[type="button"]');
+      if (updateButton) {
+        updateButton.remove();
+      }
+
+      const form = document.querySelector('form');
+      form.addEventListener('submit', createAuthor);
+    }
+
+    getAuthors();
+  </script>
+</body>
+
+</html>
