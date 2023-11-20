@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pesquisar Authors</title>
+</head>
+
+<body>
+    <h1>Pesquisar Authors</h1>
+
+    <form onsubmit="searchAuthor(event)">
+        <label for="searchBy">Pesquisar por:</label>
+        <select id="searchBy">
+            <option value="todos">All</option>
+            <option value="name">Name</option>
+            <option value="stage_name">Stage Name</option>
+            <option value="cpf">CPF</option>
+        </select>
+
+        <input type="text" id="searchTerm" placeholder="Termo de pesquisa" required>
+        <button type="submit">Pesquisar</button>
+        <button onclick="goToIndex()">Voltar</button>
+    </form>
+
+    <div id="searchResults"></div>
+
+    <script>
+        async function getAuthors() {
+            try {
+                const response = await fetch('http://localhost:3000/authors');
+                const authors = await response.json();
+                return authors;
+            } catch (error) {
+                console.error('Erro ao buscar authors:', error);
+                return [];
+            }
+        }
+
+        async function searchAuthor(event) {
+            event.preventDefault();
+
+            const searchBy = document.getElementById('searchBy').value;
+            const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+
+            try {
+                const authors = await getAuthors();
+                let filteredAuthors = [];
+
+                if (searchBy === 'todos') {
+                    filteredAuthors = authors.filter(author =>
+                        Object.values(author).some(value =>
+                            String(value).toLowerCase().includes(searchTerm)
+                        )
+                    );
+                } else {
+                    filteredAuthors = authors.filter(author =>
+                        String(author[searchBy]).toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '';
+
+                if (filteredAuthors.length > 0) {
+                    filteredAuthors.forEach(author => {
+                        const authorInfo = document.createElement('div');
+                        authorInfo.textContent = `ID: ${author.id}, Nome: ${author.name}, Stage Name: ${author.stage_name}, CPF: ${author.cpf}`;
+                        searchResults.appendChild(authorInfo);
+                    });
+                } else {
+                    searchResults.textContent = 'Nenhum usuário encontrado.';
+                }
+            } catch (error) {
+                console.error('Erro ao pesquisar authors:', error);
+            }
+        }
+
+        async function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>
