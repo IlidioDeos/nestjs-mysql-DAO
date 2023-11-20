@@ -1,5 +1,6 @@
 import { MySqlConnection } from '../database/mysql-connection';
 import { User } from '../models/user.class';
+import { RowDataPacket } from 'mysql2';
 
 export class UserDao {
   private db: MySqlConnection;
@@ -40,21 +41,6 @@ export class UserDao {
     }
   }
 
-  async updateUser(user: User): Promise<User | null> {
-    try {
-      const query = 'UPDATE users SET cpf = ?, name = ?, email = ? WHERE id = ?';
-      const result = await this.db.query(query, [user.id, user.cpf, user.name, user.email]);
-
-      if (result && result.affectedRows > 0) {
-        return user;
-      }
-
-      return null;
-    } catch (error) {
-      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
-    }
-  }
-
   async deleteUser(id: number): Promise<User | null> {
     try {
       const query = 'DELETE FROM users WHERE id = ?';
@@ -80,4 +66,21 @@ export class UserDao {
       throw new Error(`Erro ao buscar todos os usuários: ${error.message}`);
     }
   }
+
+  //Update user
+  async updateUser(user: User): Promise<User | null> {
+    try {
+      const query = 'UPDATE users SET name = ?, cpf = ?, email = ? WHERE id = ?';
+      const result = await this.db.query(query, [user.name, user.cpf, user.email, user.id]);
+
+      if (result && result.affectedRows > 0) {
+        return user;
+      }
+
+      return null;
+    } catch (error) {
+      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
+    }
+  }
+
 }

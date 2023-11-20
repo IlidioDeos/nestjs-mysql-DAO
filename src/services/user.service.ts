@@ -25,15 +25,6 @@ export class UserService {
     }
   }
 
-  async updateUser(id: number, cpf: number, name: string, email: string): Promise<User | null> {
-    try {
-      const updatedUser = new User(id, cpf, name, email);
-      return await this.userDao.updateUser(updatedUser);
-    } catch (error) {
-      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
-    }
-  }
-
   async deleteUser(id: number): Promise<User | null> {
     try {
       return await this.userDao.deleteUser(id);
@@ -49,4 +40,15 @@ export class UserService {
       throw new Error(`Erro ao buscar todos os usuários: ${error.message}`);
     }
   }
+
+  async updateUser(id: number, name: string, cpf: number, email: string): Promise<User | null> {
+    try {
+      const user = new User(id, cpf, name, email);
+      return await this.userDao.updateUser(user);
+    } catch (error) {
+      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
+    }
+  }
+
+
 }

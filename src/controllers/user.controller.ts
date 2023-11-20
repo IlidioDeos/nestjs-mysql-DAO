@@ -23,14 +23,15 @@ export class UserController {
     return this.userService.createUser(name, cpf, email);
   }
 
-
-  @Put(':id')
-  async updateUser(@Param('id') id: number, @Body() userData: Partial<User>) {
-    return this.userService.updateUser(id, userData.cpf, userData.name, userData.email);
-  }
-
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     return this.userService.deleteUser(id);
   }
+
+  @Put(':id')
+  async updateUser(@Param('id') id: number, @Body() userData: { cpf: number, name: string; email: string }): Promise<User | null> {
+    const { cpf, name, email } = userData;
+    return this.userService.updateUser(id, name, cpf, email);
+  }
+
 }
