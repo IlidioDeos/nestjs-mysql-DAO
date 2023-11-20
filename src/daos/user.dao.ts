@@ -1,6 +1,5 @@
 import { MySqlConnection } from '../database/mysql-connection';
 import { User } from '../models/user.class';
-import { RowDataPacket } from 'mysql2';
 
 export class UserDao {
   private db: MySqlConnection;

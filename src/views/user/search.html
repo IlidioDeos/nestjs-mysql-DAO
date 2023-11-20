@@ -1,0 +1,73 @@
+<!-- search.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pesquisar Usuários</title>
+</head>
+
+<body>
+    <h1>Pesquisar Usuários</h1>
+
+    <form onsubmit="searchUser(event)">
+        <label for="searchBy">Pesquisar por:</label>
+        <select id="searchBy">
+            <option value="name">Nome</option>
+            <option value="email">Email</option>
+            <option value="cpf">CPF</option>
+        </select>
+
+        <input type="text" id="searchTerm" placeholder="Termo de pesquisa" required>
+        <button type="submit">Pesquisar</button>
+        <button onclick="goToIndex()">Voltar</button>
+    </form>
+
+    <div id="searchResults"></div>
+
+    <script>
+        async function getUsers() {
+            try {
+                const response = await fetch('http://localhost:3000/users');
+                const users = await response.json();
+                return users;
+            } catch (error) {
+                console.error('Erro ao buscar usuários:', error);
+                return [];
+            }
+        }
+
+        async function searchUser(event) {
+            event.preventDefault();
+
+            const searchBy = document.getElementById('searchBy').value;
+            const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+
+            try {
+                const users = await getUsers();
+                const filteredUsers = users.filter(user => user[searchBy].toLowerCase().includes(searchTerm));
+
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '';
+
+                if (filteredUsers.length > 0) {
+                    filteredUsers.forEach(user => {
+                        const userInfo = document.createElement('div');
+                        userInfo.textContent = `ID: ${user.id}, Nome: ${user.name}, Email: ${user.email}, CPF: ${user.cpf}`;
+                        searchResults.appendChild(userInfo);
+                    });
+                } else {
+                    searchResults.textContent = 'Nenhum usuário encontrado.';
+                }
+            } catch (error) {
+                console.error('Erro ao pesquisar usuários:', error);
+            }
+        }
+
+        async function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>
