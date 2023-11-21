@@ -12,6 +12,8 @@ async function bootstrap() {
    // Configura o middleware para servir arquivos estáticos para a rota '/author'
    app.useStaticAssets(join(__dirname, '..', './src/views/author/'), { prefix: '/author' });
 
+   app.useStaticAssets(join(__dirname, '..', './src/views/category/'), { prefix: '/category' });
+
   await app.listen(3000);
 }
 bootstrap();

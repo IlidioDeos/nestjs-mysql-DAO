@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pesquisar Category</title>
+</head>
+
+<body>
+    <h1>Pesquisar Category</h1>
+
+    <form onsubmit="searchAuthor(event)">
+        <label for="searchBy">Pesquisar por:</label>
+        <select id="searchBy">
+            <option value="todos">All</option>
+            <option value="name">Name</option>
+        </select>
+
+        <input type="text" id="searchTerm" placeholder="Termo de pesquisa" required>
+        <button type="submit">Pesquisar</button>
+        <button onclick="goToIndex()">Voltar</button>
+    </form>
+
+    <div id="searchResults"></div>
+
+    <script>
+        async function getCategorys() {
+            try {
+                const response = await fetch('http://localhost:3000/categorys');
+                const categorys = await response.json();
+                return categorys;
+            } catch (error) {
+                console.error('Erro ao buscar categorys:', error);
+                return [];
+            }
+        }
+
+        async function searchAuthor(event) {
+            event.preventDefault();
+
+            const searchBy = document.getElementById('searchBy').value;
+            const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+
+            try {
+                const categorys = await getCategorys();
+                let filteredCategorys = [];
+
+                if (searchBy === 'todos') {
+                    filteredCategorys = categorys.filter(author =>
+                        Object.values(author).some(value =>
+                            String(value).toLowerCase().includes(searchTerm)
+                        )
+                    );
+                } else {
+                    filteredCategorys = categorys.filter(author =>
+                        String(author[searchBy]).toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '';
+
+                if (filteredCategorys.length > 0) {
+                    filteredCategorys.forEach(author => {
+                        const authorInfo = document.createElement('div');
+                        authorInfo.textContent = `ID: ${author.id}, Nome: ${author.name}`;
+                        searchResults.appendChild(authorInfo);
+                    });
+                } else {
+                    searchResults.textContent = 'Nenhum usuário encontrado.';
+                }
+            } catch (error) {
+                console.error('Erro ao pesquisar categorys:', error);
+            }
+        }
+
+        async function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>
