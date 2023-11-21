@@ -5,10 +5,12 @@ import { UserController } from './controllers/user.controller';
 import { UserService } from './services/user.service';
 import { AuthorService } from './services/author.service';
 import { AuthorController } from './controllers/author.controller';
+import { CategoryController } from './controllers/category.controller';
+import { CategoryService } from './services/category.service';
 
 @Module({
   imports: [],
-  controllers: [AppController, UserController, AuthorController],
-  providers: [AppService, UserService, AuthorService],
+  controllers: [AppController, UserController, AuthorController, CategoryController],
+  providers: [AppService, UserService, AuthorService, CategoryService],
 })
 export class AppModule {}

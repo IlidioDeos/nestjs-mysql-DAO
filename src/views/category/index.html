@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciamento de Category</title>
+</head>
+
+<body>
+  <h1>Gerenciamento de Category</h1>
+
+  <h2>Adicionar Category</h2>
+  <form onsubmit="createCategory(event)">
+    <input type="text" id="name" placeholder="Nome" required>
+    <button type="submit">Adicionar Category</button>
+  </form>
+
+  <h2>Category</h2>
+  <ul id="categoryList"></ul>
+
+  <h2>Pesquisar Category</h2>
+  <button onclick="redirectToSearch()">Pesquisar Category</button>
+
+  <script>
+    async function getCategorys() {
+      try {
+        const response = await fetch('http://localhost:3000/categorys');
+        const categorys = await response.json();
+
+        const categoryList = document.getElementById('categoryList');
+        categoryList.innerHTML = '';
+
+        categorys.forEach(category => {
+          const li = document.createElement('li');
+          li.textContent = `ID: ${category.id}, Nome: ${category.name}`;
+
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Excluir';
+          deleteButton.addEventListener('click', () => deleteCategory(category.id));
+
+          const updateButton = document.createElement('button');
+          updateButton.textContent = 'Editar';
+          updateButton.addEventListener('click', () => redirectToUpdate(category.id));
+
+          li.appendChild(updateButton);
+          li.appendChild(deleteButton);
+          categoryList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar category:', error);
+      }
+    }
+
+    async function redirectToUpdate(categoryId) {
+      window.location.href = `update.html?categoryId=${categoryId}`;
+    }
+
+    function redirectToSearch() {
+      window.location.href = 'search.html';
+    }
+
+    async function createCategory(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('name').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/categorys', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name }),
+        });
+
+        if (response.ok) {
+          getCategorys();
+        } else {
+          console.error('Erro ao criar Category');
+        }
+      } catch (error) {
+        console.error('Erro ao criar Category:', error);
+      }
+    }
+
+    async function deleteCategory(categoryId) {
+      try {
+        const response = await fetch(`http://localhost:3000/categorys/${categoryId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          getCategorys();
+        } else {
+          console.error('Erro ao excluir Category');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir Category:', error);
+      }
+    }
+
+
+
+    function clearForm() {
+      document.getElementById('name').value = '';
+
+      const updateButton = document.querySelector('button[type="button"]');
+      if (updateButton) {
+        updateButton.remove();
+      }
+
+      const form = document.querySelector('form');
+      form.addEventListener('submit', createCategory);
+    }
+
+    getCategorys();
+  </script>
+</body>
+
+</html>
