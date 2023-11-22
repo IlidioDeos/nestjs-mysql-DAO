@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Gerenciamento de Musicas</title>
+</head>
+
+<body>
+  <h1>Gerenciamento de Musicas</h1>
+
+  <h2>Adicionar Musica</h2>
+  <form onsubmit="createMusic(event)">
+    <input type="text" id="title" placeholder="Title" required>
+    <input type="text" id="lyrics" placeholder="Lyrics" required>
+    <input type="text" id="duration" placeholder="Duration" required>
+    <input type="date" data-format="dd/mm/yyyy" id="release_date" required>
+    <button type="submit">Adicionar Musica</button>
+  </form>
+
+  <h2>Musicas</h2>
+  <ul id="musicList"></ul>
+
+  <h2>Pesquisar Musicas</h2>
+  <button onclick="redirectToSearch()">Pesquisar Musicas</button>
+
+  <script>
+    async function getMusics() {
+      try {
+        const response = await fetch('http://localhost:3000/musics');
+        const musics = await response.json();
+
+        const musicList = document.getElementById('musicList');
+        musicList.innerHTML = '';
+
+        musics.forEach(music => {
+          const li = document.createElement('li');
+          li.textContent = `ID: ${music.id}, Nome: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Release Date: ${music.release_date}`;
+
+
+          const deleteButton = document.createElement('button');
+          deleteButton.textContent = 'Excluir';
+          deleteButton.addEventListener('click', () => deleteMusic(music.id));
+
+          const updateButton = document.createElement('button');
+          updateButton.textContent = 'Editar';
+          updateButton.addEventListener('click', () => redirectToUpdate(music.id));
+
+          li.appendChild(updateButton);
+          li.appendChild(deleteButton);
+          musicList.appendChild(li);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar Musicas:', error);
+      }
+    }
+
+    async function redirectToUpdate(musicId) {
+      window.location.href = `update.html?musicId=${musicId}`;
+    }
+
+    function redirectToSearch() {
+      window.location.href = 'search.html';
+    }
+
+    async function createMusic(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('title').value;
+      const lyrics = document.getElementById('lyrics').value;
+      const duration = document.getElementById('duration').value;
+      const release_date = document.getElementById('release_date').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/musics', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ title, lyrics, duration, release_date }),
+        });
+
+        if (response.ok) {
+          getMusics();
+        } else {
+          console.error('Erro ao criar Musica');
+        }
+      } catch (error) {
+        console.error('Erro ao criar Musica:', error);
+      }
+    }
+
+    async function deleteMusic(musicId) {
+      try {
+        const response = await fetch(`http://localhost:3000/musics/${musicId}`, {
+          method: 'DELETE'
+        });
+
+        if (response.ok) {
+          getMusics();
+        } else {
+          console.error('Erro ao excluir Musica');
+        }
+      } catch (error) {
+        console.error('Erro ao excluir Musica:', error);
+      }
+    }
+
+
+
+    function clearForm() {
+      document.getElementById('title').value = '';
+      document.getElementById('lyrics').value = '';
+      document.getElementById('duration').value = '';
+      document.getElementById('release_date').value = '';
+
+      const updateButton = document.querySelector('button[type="button"]');
+      if (updateButton) {
+        updateButton.remove();
+      }
+
+      const form = document.querySelector('form');
+      form.addEventListener('submit', createMusic);
+    }
+
+    getMusics();
+  </script>
+</body>
+
+</html>
