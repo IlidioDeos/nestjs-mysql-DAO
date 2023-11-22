@@ -12,9 +12,14 @@ export class MusicAuthorController {
     return this.musicAuthorService.getAllMusicAuthors();
   }
 
-  @Get(':id')
-  async getMusicAuthorById(@Param('id') id: number): Promise<MusicAuthor | null> {
-    return this.musicAuthorService.getMusicAuthorById(id);
+  @Get(':author_id')
+  async getMusicAuthorByAuthorId(@Param('author_id') author_id: number): Promise<MusicAuthor | null> {
+    return this.musicAuthorService.getMusicAuthorById(author_id);
+  }
+
+  @Get(':music_id')
+  async getMusicAuthorByMusicId(@Param('music_id') music_id: number): Promise<MusicAuthor | null> {
+    return this.musicAuthorService.getMusicAuthorById(music_id);
   }
 
   @Post()
@@ -23,15 +28,21 @@ export class MusicAuthorController {
     return this.musicAuthorService.createMusicAuthor(music_id, author_id);
   }
 
-  @Delete(':id')
-  async deleteMusicAuthor(@Param('id') id: number) {
-    return this.musicAuthorService.deleteMusicAuthor(id);
+  @Delete(':author_id')
+  async deleteMusicAuthorByAuthorId(@Param('author_id') author_id: number) {
+    return this.musicAuthorService.deleteMusicAuthor(author_id);
   }
 
-  @Put(':id')
-  async updateMusicAuthor(@Param('id') id: number, @Body() musicAuthorData: { music_id: number, author_id: number }): Promise<MusicAuthor | null> {
-    const { music_id, author_id } = musicAuthorData;
-    return this.musicAuthorService.updateMusicAuthor(music_id, author_id);
+  @Delete(':music_id')
+  async deleteMusicAuthorByMusicId(@Param('music_id') music_id: number) {
+    return this.musicAuthorService.deleteMusicAuthor(music_id);
   }
 
+  @Put('music/:music_id/author/:author_id')
+async updateMusicAuthor(
+  @Body() musicAuthorData: { music_id: number, author_id: number }
+): Promise<MusicAuthor | null> {
+  const { music_id: updatedMusicId, author_id: updatedAuthorId } = musicAuthorData;
+  return this.musicAuthorService.updateMusicAuthor(updatedMusicId, updatedAuthorId);
+}
 }
