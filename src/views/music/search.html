@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Pesquisar Musicas</title>
+</head>
+
+<body>
+    <h1>Pesquisar Musicas</h1>
+
+    <form onsubmit="searchMusic(event)">
+        <label for="searchBy">Pesquisar por:</label>
+        <select id="searchBy">
+            <option value="todos">Todos</option>
+            <option value="title">Title</option>
+            <option value="lyrics">Lyrics</option>
+            <option value="release_date">Release Date</option>
+        </select>
+
+        <input type="text" id="searchTerm" placeholder="Termo de pesquisa" required>
+        <button type="submit">Pesquisar</button>
+        <button onclick="goToIndex()">Voltar</button>
+    </form>
+
+    <div id="searchResults"></div>
+
+    <script>
+        async function getMusics() {
+            try {
+                const response = await fetch('http://localhost:3000/musics');
+                const musics = await response.json();
+                return musics;
+            } catch (error) {
+                console.error('Erro ao buscar Musicas:', error);
+                return [];
+            }
+        }
+
+        async function searchMusic(event) {
+            event.preventDefault();
+
+            const searchBy = document.getElementById('searchBy').value;
+            const searchTerm = document.getElementById('searchTerm').value.toLowerCase();
+
+            try {
+                const musics = await getMusics();
+                let filteredMusics = [];
+
+                if (searchBy === 'todos') {
+                    filteredMusics = musics.filter(music =>
+                        Object.values(music).some(value =>
+                            String(value).toLowerCase().includes(searchTerm)
+                        )
+                    );
+                } else {
+                    filteredMusics = musics.filter(music =>
+                        String(music[searchBy]).toLowerCase().includes(searchTerm)
+                    );
+                }
+
+                const searchResults = document.getElementById('searchResults');
+                searchResults.innerHTML = '';
+
+                if (filteredMusics.length > 0) {
+                    filteredMusics.forEach(music => {
+                        const musicInfo = document.createElement('div');
+                        musicInfo.textContent = `ID: ${music.id}, Nome: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Release Date: ${music.release_date}`;
+                        searchResults.appendChild(musicInfo);
+                    });
+                } else {
+                    searchResults.textContent = 'Nenhum musica encontrado.';
+                }
+            } catch (error) {
+                console.error('Erro ao pesquisar Musicas:', error);
+            }
+        }
+
+        async function goToIndex() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+
+</html>

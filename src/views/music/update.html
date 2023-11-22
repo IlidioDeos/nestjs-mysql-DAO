@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Update Music</title>
+</head>
+
+<body>
+    <h1>Update Music</h1>
+
+    <form id="updateMusicForm">
+        <input type="text" id="title" placeholder="Nome" required>
+        <input type="text" id="lyrics" placeholder="Lyrics" required>
+        
+
+        <button type="submit">Salvar</button>
+        <button onclick="goBack()">Voltar</button>
+    </form>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const musicId = urlParams.get('musicId');
+
+        async function getMusicDetails(musicId) {
+            try {
+                const response = await fetch(`http://localhost:3000/musics/${musicId}`);
+                const music = await response.json();
+
+                document.getElementById('title').value = music.title;
+                document.getElementById('lyrics').value = music.lyrics;
+                
+
+            } catch (error) {
+                console.error('Erro ao buscar detalhes do usuário:', error);
+            }
+        }
+
+        async function updateMusic(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const lyrics = document.getElementById('lyrics').value;
+            
+
+
+            try {
+                const response = await fetch(`http://localhost:3000/musics/${musicId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, lyrics }),
+                });
+
+                if (response.ok) {
+                    // Redireciona de volta para index.html após a atualização
+                    window.location.href = 'index.html';
+                } else {
+                    console.error('Erro ao atualizar usuário');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar usuário:', error);
+            }
+        }
+
+        async function goBack() {
+            window.history.back();
+        }
+
+        getMusicDetails(musicId);
+        document.getElementById('updateMusicForm').addEventListener('submit', updateMusic);
+    </script>
+</body>
+
+</html>
