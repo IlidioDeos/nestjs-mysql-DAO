@@ -18,9 +18,9 @@ export class MusicController {
   }
 
   @Post()
-  async createMusic(@Body() musicData: { title: string, lyrics: string, release_date: Date, duration: number }): Promise<Music | null> {
-    const { title, lyrics, release_date, duration } = musicData;
-    return this.musicService.createMusic(title, lyrics, release_date, duration);
+  async createMusic(@Body() musicData: { title: string, lyrics: string, release_date: Date, duration: string, category_id: number, author_id: number }): Promise<Music | null> {
+    const { title, lyrics, release_date, duration, category_id, author_id } = musicData;
+    return this.musicService.createMusic(title, lyrics, release_date, duration, category_id, author_id);
   }
 
   @Delete(':id')
@@ -29,9 +29,8 @@ export class MusicController {
   }
 
   @Put(':id')
-  async updateMusic(@Param('id') id: number, @Body() musicData: { title: string, lyrics: string, release_date: Date, duration: number }): Promise<Music | null> {
-    const { title, lyrics, release_date, duration } = musicData;
-    return this.musicService.updateMusic(id, title, lyrics, release_date, duration);
+  async updateMusic(@Param('id') id: number, @Body() musicData: { title: string, lyrics: string, release_date: Date, duration: string, category_id: number, author_id: number }): Promise<Music | null> {
+    const { title, lyrics, release_date, duration, category_id, author_id } = musicData;
+    return this.musicService.updateMusic(id, title, lyrics, release_date, duration, category_id, author_id);
   }
-
 }

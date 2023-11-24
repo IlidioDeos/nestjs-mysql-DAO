@@ -1,3 +1,5 @@
+import { Music } from 'src/models/music.class';
+import { Author } from 'src/models/author.class';
 import { MySqlConnection } from '../database/mysql-connection';
 import { MusicAuthor } from '../models/music_author.class';
 
@@ -8,78 +10,59 @@ export class MusicAuthorDao {
     this.db = new MySqlConnection();
   }
 
-  async createMusicAuthor(musicAuthor: MusicAuthor): Promise<MusicAuthor | null> {
+  async getAuthorsByMusicId(musicId: number): Promise<any[]> {
     try {
-      const query = 'INSERT INTO music_authors (music_id, author_id) VALUES (?, ?)';
-      const result = await this.db.query(query, [musicAuthor.music_id, musicAuthor.author_id]);
+      const query = 'SELECT a.* FROM author a INNER JOIN music_author ma ON a.id = ma.author_id WHERE ma.music_id = ?';
+      const result = await this.db.query(query, [musicId]);
 
-      if (result && result.insertId) {
-        musicAuthor.music_id = result.insertId;
-        return musicAuthor;
-      }
-
-      return null;
+      return result[0];
     } catch (error) {
-      throw new Error(`Erro ao criar usuário: ${error.message}`);
+      throw new Error(`Erro ao buscar autores por ID da música: ${error.message}`);
     }
   }
 
-  async getMusicAuthorById(music_id: number): Promise<MusicAuthor | null> {
+  async getMusicByAuthorId(authorId: number): Promise<any[]> {
     try {
-      const query = 'SELECT * FROM music_authors WHERE music_id = ?';
-      const results = await this.db.query(query, [music_id]);
+      const query = 'SELECT m.* FROM music m INNER JOIN music_author ma ON m.id = ma.music_id WHERE ma.author_id = ?';
+      const result = await this.db.query(query, [authorId]);
 
-      if (results && results.length > 0) {
-        const musicAuthorData = results[0];
-        return new MusicAuthor(musicAuthorData.music_id, musicAuthorData.author_id);
-      }
-
-      return null;
+      return result[0];
     } catch (error) {
-      throw new Error(`Erro ao buscar usuário por ID: ${error.message}`);
+      throw new Error(`Erro ao buscar músicas por ID do autor: ${error.message}`);
     }
   }
 
-  async deleteMusicAuthor(music_id: number): Promise<MusicAuthor | null> {
+  async getMusicByAuthorName(authorName: string): Promise<any[]> {
     try {
-      const query = 'DELETE FROM music_authors WHERE music_id = ?';
-      const result = await this.db.query(query, [music_id]);
+      const query = `
+        SELECT m.* 
+        FROM music m 
+        INNER JOIN music_author ma ON m.id = ma.music_id 
+        INNER JOIN author a ON a.id = ma.author_id 
+        WHERE a.name = ?
+      `;
+      const result = await this.db.query(query, [authorName]);
 
-      if (result && result.affectedRows > 0) {
-        return null;
-      }
-
-      return null;
+      return result[0]; // Retorna a lista de músicas do autor pelo nome do autor
     } catch (error) {
-      throw new Error(`Erro ao deletar usuário: ${error.message}`);
+      throw new Error(`Erro ao buscar músicas pelo nome do autor: ${error.message}`);
     }
   }
 
-  async getAllMusicAuthors(): Promise<MusicAuthor[]> {
+  async getAuthorsByMusicName(musicName: string): Promise<any[]> {
     try {
-      const query = 'SELECT * FROM music_authors';
-      const results = await this.db.query(query);
+      const query = `
+        SELECT a.* 
+        FROM author a 
+        INNER JOIN music_author ma ON a.id = ma.author_id 
+        INNER JOIN music m ON m.id = ma.music_id 
+        WHERE m.title = ?
+      `;
+      const result = await this.db.query(query, [musicName]);
 
-      return results.map((musicAuthorData: any) => new MusicAuthor(musicAuthorData.music_id, musicAuthorData.author_id));
+      return result[0]; // Retorna a lista de autores pela música pelo nome da música
     } catch (error) {
-      throw new Error(`Erro ao buscar todos os usuários: ${error.message}`);
+      throw new Error(`Erro ao buscar autores pelo nome da música: ${error.message}`);
     }
   }
-
-  //Update musicAuthor
-  async updateMusicAuthor(musicAuthor: MusicAuthor): Promise<MusicAuthor | null> {
-    try {
-      const query = 'UPDATE music_authors SET music_id = ?, author_id = ?';
-      const result = await this.db.query(query, [musicAuthor.music_id, musicAuthor.author_id]);
-
-      if (result && result.affectedRows > 0) {
-        return musicAuthor;
-      }
-
-      return null;
-    } catch (error) {
-      throw new Error(`Erro ao atualizar usuário: ${error.message}`);
-    }
-  }
-
 }

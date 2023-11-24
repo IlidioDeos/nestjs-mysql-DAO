@@ -4,8 +4,7 @@ import { Author } from '../models/author.class';
 
 @Controller('authors')
 export class AuthorController {
-  constructor(private readonly authorService: AuthorService) { }
-
+  constructor(private readonly authorService: AuthorService) {}
 
   @Get()
   async getAllAuthors(): Promise<Author[] | null> {
@@ -33,5 +32,4 @@ export class AuthorController {
     const { cpf, name, stage_name } = authorData;
     return this.authorService.updateAuthor(id, name, cpf, stage_name);
   }
-
 }

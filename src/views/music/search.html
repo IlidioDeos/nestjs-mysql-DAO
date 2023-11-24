@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Pesquisar Musicas</title>
+    <title>Pesquisar Músicas</title>
 </head>
 
 <body>
-    <h1>Pesquisar Musicas</h1>
+    <h1>Pesquisar Músicas</h1>
 
     <form onsubmit="searchMusic(event)">
         <label for="searchBy">Pesquisar por:</label>
@@ -32,8 +32,19 @@
                 const musics = await response.json();
                 return musics;
             } catch (error) {
-                console.error('Erro ao buscar Musicas:', error);
+                console.error('Erro ao buscar Músicas:', error);
                 return [];
+            }
+        }
+
+        async function getReleaseDateById(id) {
+            try {
+                const response = await fetch(`http://localhost:3000/musics/releaseDate/${id}`);
+                const music = await response.json();
+                return music.release_date;
+            } catch (error) {
+                console.error('Erro ao obter a data de lançamento:', error);
+                return null;
             }
         }
 
@@ -63,20 +74,27 @@
                 searchResults.innerHTML = '';
 
                 if (filteredMusics.length > 0) {
-                    filteredMusics.forEach(music => {
+                    for (const music of filteredMusics) {
+                        let releaseDate = music.release_date;
+                        if (!releaseDate) {
+                            // Se o release_date for nulo, obter a data de lançamento original usando o ID
+                            releaseDate = await getReleaseDateById(music.id);
+                        }
+                        releaseDate = releaseDate ? new Date(releaseDate).toLocaleDateString() : 'Undefined';
+
                         const musicInfo = document.createElement('div');
-                        musicInfo.textContent = `ID: ${music.id}, Nome: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Release Date: ${music.release_date}`;
+                        musicInfo.textContent = `ID: ${music.id}, Title: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Updated : ${releaseDate}`;
                         searchResults.appendChild(musicInfo);
-                    });
+                    }
                 } else {
-                    searchResults.textContent = 'Nenhum musica encontrado.';
+                    searchResults.textContent = 'Nenhuma música encontrada.';
                 }
             } catch (error) {
-                console.error('Erro ao pesquisar Musicas:', error);
+                console.error('Erro ao pesquisar Músicas:', error);
             }
         }
 
-        async function goToIndex() {
+        function goToIndex() {
             window.location.href = 'index.html';
         }
     </script>
