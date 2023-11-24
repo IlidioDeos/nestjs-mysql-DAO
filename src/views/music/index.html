@@ -2,129 +2,151 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>Gerenciamento de Musicas</title>
+    <meta charset="UTF-8">
+    <title>Gerenciamento de Músicas</title>
 </head>
 
 <body>
-  <h1>Gerenciamento de Musicas</h1>
+    <h1>Gerenciamento de Músicas</h1>
 
-  <h2>Adicionar Musica</h2>
-  <form onsubmit="createMusic(event)">
-    <input type="text" id="title" placeholder="Title" required>
-    <input type="text" id="lyrics" placeholder="Lyrics" required>
-    <input type="text" id="duration" placeholder="Duration" required>
-    <input type="date" data-format="dd/mm/yyyy" id="release_date" required>
-    <button type="submit">Adicionar Musica</button>
-  </form>
+    <h2>Adicionar Música</h2>
+    <form onsubmit="createMusic(event)">
+        <!-- Campos visíveis para o usuário -->
+        <input type="text" id="title" placeholder="Title" required>
+        <input type="text" id="lyrics" placeholder="Lyrics" required>
+        <input type="text" id="duration" placeholder="Duration" required>
+        <input type="date" id="release_date" required>
+        <select id="category_id" required>
+            <!-- Options preenchidas dinamicamente via JavaScript -->
+        </select>
+        <button type="submit">Adicionar Música</button>
+    </form>
 
-  <h2>Musicas</h2>
-  <ul id="musicList"></ul>
+    <h2>Músicas</h2>
+    <ul id="musicList"></ul>
 
-  <h2>Pesquisar Musicas</h2>
-  <button onclick="redirectToSearch()">Pesquisar Musicas</button>
+    <h2>Pesquisar Músicas</h2>
+    <button onclick="redirectToSearch()">Pesquisar Músicas</button>
 
-  <script>
-    async function getMusics() {
-      try {
-        const response = await fetch('http://localhost:3000/musics');
-        const musics = await response.json();
+    <script>
+        async function getMusics() {
+            // Função para buscar e exibir músicas
+            try {
+                const response = await fetch('http://localhost:3000/musics');
+                const musics = await response.json();
 
-        const musicList = document.getElementById('musicList');
-        musicList.innerHTML = '';
+                const musicList = document.getElementById('musicList');
+                musicList.innerHTML = '';
 
-        musics.forEach(music => {
-          const li = document.createElement('li');
-          li.textContent = `ID: ${music.id}, Nome: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Release Date: ${music.release_date}`;
+                musics.forEach(music => {
+                    const li = document.createElement('li');
+                    li.textContent = `ID: ${music.id}, Nome: ${music.title}, Lyrics: ${music.lyrics}, Duration: ${music.duration}, Release Date: ${formatDateForDisplay(music.release_date)}`;
 
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Excluir';
+                    deleteButton.addEventListener('click', () => deleteMusic(music.id));
 
-          const deleteButton = document.createElement('button');
-          deleteButton.textContent = 'Excluir';
-          deleteButton.addEventListener('click', () => deleteMusic(music.id));
+                    const updateButton = document.createElement('button');
+                    updateButton.textContent = 'Editar';
+                    updateButton.addEventListener('click', () => redirectToUpdate(music.id));
 
-          const updateButton = document.createElement('button');
-          updateButton.textContent = 'Editar';
-          updateButton.addEventListener('click', () => redirectToUpdate(music.id));
-
-          li.appendChild(updateButton);
-          li.appendChild(deleteButton);
-          musicList.appendChild(li);
-        });
-      } catch (error) {
-        console.error('Erro ao buscar Musicas:', error);
-      }
-    }
-
-    async function redirectToUpdate(musicId) {
-      window.location.href = `update.html?musicId=${musicId}`;
-    }
-
-    function redirectToSearch() {
-      window.location.href = 'search.html';
-    }
-
-    async function createMusic(event) {
-      event.preventDefault();
-
-      const title = document.getElementById('title').value;
-      const lyrics = document.getElementById('lyrics').value;
-      const duration = document.getElementById('duration').value;
-      const release_date = document.getElementById('release_date').value;
-
-      try {
-        const response = await fetch('http://localhost:3000/musics', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ title, lyrics, duration, release_date }),
-        });
-
-        if (response.ok) {
-          getMusics();
-        } else {
-          console.error('Erro ao criar Musica');
+                    li.appendChild(updateButton);
+                    li.appendChild(deleteButton);
+                    musicList.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar Músicas:', error);
+            }
         }
-      } catch (error) {
-        console.error('Erro ao criar Musica:', error);
-      }
-    }
 
-    async function deleteMusic(musicId) {
-      try {
-        const response = await fetch(`http://localhost:3000/musics/${musicId}`, {
-          method: 'DELETE'
-        });
+        function formatDateForDisplay(dateString) {
+            // Função para formatar a data exibida para o usuário
+            const date = new Date(dateString);
+            const year = date.getFullYear();
+            let month = (1 + date.getMonth()).toString().padStart(2, '0');
+            let day = date.getDate().toString().padStart(2, '0');
 
-        if (response.ok) {
-          getMusics();
-        } else {
-          console.error('Erro ao excluir Musica');
+            return `${year}-${month}-${day}`;
         }
-      } catch (error) {
-        console.error('Erro ao excluir Musica:', error);
-      }
-    }
 
+        async function redirectToUpdate(musicId) {
+            // Função para redirecionar para a página de atualização
+            window.location.href = `update.html?musicId=${musicId}`;
+        }
 
+        function redirectToSearch() {
+            // Função para redirecionar para a página de pesquisa
+            window.location.href = 'search.html';
+        }
 
-    function clearForm() {
-      document.getElementById('title').value = '';
-      document.getElementById('lyrics').value = '';
-      document.getElementById('duration').value = '';
-      document.getElementById('release_date').value = '';
+        async function createMusic(event) {
+            // Função para criar uma música
+            event.preventDefault();
 
-      const updateButton = document.querySelector('button[type="button"]');
-      if (updateButton) {
-        updateButton.remove();
-      }
+            const title = document.getElementById('title').value;
+            const lyrics = document.getElementById('lyrics').value;
+            const duration = document.getElementById('duration').value;
+            const release_date = document.getElementById('release_date').value;
+            const category_id = document.getElementById('category_id').value;
 
-      const form = document.querySelector('form');
-      form.addEventListener('submit', createMusic);
-    }
+            try {
+                const response = await fetch('http://localhost:3000/musics', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title, lyrics, duration, release_date, category_id }),
+                });
 
-    getMusics();
-  </script>
+                if (response.ok) {
+                    getMusics();
+                } else {
+                    console.error('Erro ao criar Música');
+                }
+            } catch (error) {
+                console.error('Erro ao criar Música:', error);
+            }
+        }
+
+        async function deleteMusic(musicId) {
+            // Função para deletar uma música
+            try {
+                const response = await fetch(`http://localhost:3000/musics/${musicId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    getMusics();
+                } else {
+                    console.error('Erro ao excluir Música');
+                }
+            } catch (error) {
+                console.error('Erro ao excluir Música:', error);
+            }
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:3000/categorys');
+                const categories = await response.json();
+
+                const categoryDropdown = document.getElementById('category_id');
+                categoryDropdown.innerHTML = '';
+
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categoryDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+            }
+        }
+
+        loadCategories();
+        getMusics();
+    </script>
 </body>
 
 </html>

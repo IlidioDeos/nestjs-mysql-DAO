@@ -8,9 +8,9 @@ export class MusicService {
     this.musicDao = new MusicDao();
   }
 
-  async createMusic(title: string, lyrics: string, release_date: Date, duration: number): Promise<Music | null> {
+  async createMusic(title: string, lyrics: string, release_date: Date, duration: string, category_id: number, author_id: number): Promise<Music | null> {
     try {
-      const newMusic = new Music(null, title, lyrics, release_date, duration);
+      const newMusic = new Music(null, title, lyrics, release_date, duration, category_id, author_id);
       return await this.musicDao.createMusic(newMusic);
     } catch (error) {
       throw new Error(`Erro ao criar usuário: ${error.message}`);
@@ -41,12 +41,22 @@ export class MusicService {
     }
   }
 
-  async updateMusic(id: number, title: string, lyrics: string, release_date: Date, duration: number): Promise<Music | null> {
+  async updateMusic(id: number, title: string, lyrics: string, release_date: Date, duration: string, category_id: number, author_id: number): Promise<Music | null> {
     try {
-      const music = new Music(id, title, lyrics, release_date, duration);
+      // Verifica e formata a data se necessário
+      const formattedDate = (release_date instanceof Date && !isNaN(release_date.getTime())) ? release_date : new Date();
+  
+      const music = new Music(id, title, lyrics, formattedDate, duration, category_id, author_id);
       return await this.musicDao.updateMusic(music);
     } catch (error) {
       throw new Error(`Erro ao atualizar usuário: ${error.message}`);
+    }
+  }
+  async getMusicReleaseDateById(id: number): Promise<Date | null> {
+    try {
+      return await this.musicDao.getMusicReleaseDateById(id);
+    } catch (error) {
+      throw new Error(`Erro ao obter a data de lançamento da música: ${error.message}`);
     }
   }
 

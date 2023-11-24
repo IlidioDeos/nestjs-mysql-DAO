@@ -9,10 +9,13 @@ import { CategoryController } from './controllers/category.controller';
 import { CategoryService } from './services/category.service';
 import { MusicController } from './controllers/music.controller';
 import { MusicService } from './services/music.service';
+import { MusicAuthorController } from './controllers/music_author.controller';
+import { MusicAuthorService } from './services/music_author.service';
+import { MusicAuthorDao } from './daos/music_author.dao';
 
 @Module({
   imports: [],
-  controllers: [AppController, UserController, AuthorController, CategoryController, MusicController],
-  providers: [AppService, UserService, AuthorService, CategoryService, MusicService],
+  controllers: [AppController, UserController, AuthorController, CategoryController, MusicController, MusicAuthorController],
+  providers: [AppService, UserService, AuthorService, CategoryService, MusicService, MusicAuthorService, MusicAuthorDao],
 })
 export class AppModule {}

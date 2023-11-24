@@ -10,9 +10,12 @@
     <h1>Update Music</h1>
 
     <form id="updateMusicForm">
-        <input type="text" id="title" placeholder="Nome" required>
+        <input type="text" id="title" placeholder="Title" required>
         <input type="text" id="lyrics" placeholder="Lyrics" required>
-        
+        <input type="text" id="duration" placeholder="Duration" required>
+        <select id="category_id" required>
+            <!-- Options preenchidas dinamicamente via JavaScript -->
+        </select>
 
         <button type="submit">Salvar</button>
         <button onclick="goBack()">Voltar</button>
@@ -24,15 +27,18 @@
 
         async function getMusicDetails(musicId) {
             try {
-                const response = await fetch(`http://localhost:3000/musics/${musicId}`);
-                const music = await response.json();
+                const responseMusic = await fetch(`http://localhost:3000/musics/${musicId}`);
+                const music = await responseMusic.json();
 
                 document.getElementById('title').value = music.title;
                 document.getElementById('lyrics').value = music.lyrics;
-                
+                document.getElementById('duration').value = music.duration;
+
+                await loadCategories();
+                document.getElementById('category_id').value = music.category_id;
 
             } catch (error) {
-                console.error('Erro ao buscar detalhes do usuário:', error);
+                console.error('Erro ao buscar detalhes da música:', error);
             }
         }
 
@@ -41,8 +47,8 @@
 
             const title = document.getElementById('title').value;
             const lyrics = document.getElementById('lyrics').value;
-            
-
+            const duration = document.getElementById('duration').value;
+            const category_id = document.getElementById('category_id').value;
 
             try {
                 const response = await fetch(`http://localhost:3000/musics/${musicId}`, {
@@ -50,22 +56,41 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ title, lyrics }),
+                    body: JSON.stringify({ title, lyrics, duration, category_id }),
                 });
 
                 if (response.ok) {
                     // Redireciona de volta para index.html após a atualização
                     window.location.href = 'index.html';
                 } else {
-                    console.error('Erro ao atualizar usuário');
+                    console.error('Erro ao atualizar música');
                 }
             } catch (error) {
-                console.error('Erro ao atualizar usuário:', error);
+                console.error('Erro ao atualizar música:', error);
             }
         }
 
         async function goBack() {
             window.history.back();
+        }
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:3000/categorys');
+                const categories = await response.json();
+
+                const categoryDropdown = document.getElementById('category_id');
+                categoryDropdown.innerHTML = '';
+
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    categoryDropdown.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+            }
         }
 
         getMusicDetails(musicId);

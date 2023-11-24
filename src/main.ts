@@ -16,6 +16,8 @@ async function bootstrap() {
 
    app.useStaticAssets(join(__dirname, '..', './src/views/music/'), { prefix: '/music' });
 
+  
+
   await app.listen(3000);
 }
 bootstrap();
